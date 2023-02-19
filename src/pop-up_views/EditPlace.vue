@@ -6,7 +6,7 @@
         <p class="title">Редактирование профиля</p>
         <div class="content_container">
           <p class="image_container_title">Фото профиля</p>
-          <AddedImage
+          <ProfileImage
             v-if="this.place.profile_photo !== null"
             v-bind:image="this.place.profile_photo"
             class="added_image_component"
@@ -100,11 +100,13 @@
 import axios from "axios";
 import AddedImage from "@/profiles_views/AddedImage";
 import NoInfoError from "@/profiles_views/NoInfoError";
+import ProfileImage from "@/profiles_views/ProfileImage.vue";
 export default {
   props: ["place", "token"],
   components: {
     AddedImage,
     NoInfoError,
+    ProfileImage
   },
   data() {
     return {
@@ -189,7 +191,7 @@ export default {
             headers: {
               Accept: "application/json",
               "Content-Type": "application/json",
-              Authorization: "Token " + this.token
+              Authorization: "Token " + this.token,
             },
             body: `{
                 "name": "${this.place_name}",
@@ -204,7 +206,7 @@ export default {
 
       this.saveImages();
     },
-    saveImages() {
+    async saveImages() {
       let formData = new FormData();
       if (this.profile_photo != null) {
         formData.append("profile_photo", this.profile_photo.data);
@@ -219,7 +221,7 @@ export default {
         formData.append("image3", this.image3.data);
       }
 
-      axios.put(
+      await axios.put(
         "https://webcreator.pythonanywhere.com/users/place/image/" + this.place.id + "/",
         formData,
         { headers: { Authorization: "Token " + this.token } }
